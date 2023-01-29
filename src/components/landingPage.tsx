@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
-import {AutoComplete, Button, Col, Divider, Input, List, Row, Tooltip, Typography} from 'antd';
+import {AutoComplete, Button, Col, Divider, Input, List, notification, Row, Tooltip, Typography} from 'antd';
 import StockChart from "./stockChart";
-import {PickListOption, SearchTickerSymbolResponse, TickerSymbol} from "../types";
+import {NotificationType, PickListOption, TickerSymbol} from "../types";
 import {searchTickerSymbol} from "../services";
 import './LandingPage.css';
-import {DeleteOutlined, StarOutlined} from '@ant-design/icons';
+import {DeleteOutlined, StarFilled, StarOutlined} from '@ant-design/icons';
 
 const {Title, Text} = Typography;
 
@@ -15,41 +15,73 @@ export default function LandingPage() {
     const [options, setOptions] = useState<PickListOption[]>([]);
     const [symbolData, setSymbolData] = useState<TickerSymbol>();
 
+    const [api, contextHolder] = notification.useNotification();
+
+    const openNotificationWithIcon = (type: NotificationType, message: string, description: string) => {
+        api[type]({
+            message,
+            description,
+        });
+    };
+
     const handleSearch = (value: string) => {
         if (value.length >= 2) {
             searchTickerSymbol(value).then(
-                (result: SearchTickerSymbolResponse) =>
-                    setOptions(result.bestMatches.map(tickerSymbol => ({
-                        value: tickerSymbol['1. symbol'],
-                        label: `${tickerSymbol['2. name']}(${tickerSymbol['1. symbol']})`
-                    })))
+                (result: any) => {
+                    console.log(result)
+                    if (!result.bestMatches) {
+                        openNotificationWithIcon('warning', 'Too Many Requests', result.message);
+                    } else {
+                        setOptions(result.bestMatches.map(tickerSymbol => ({
+                            value: tickerSymbol['1. symbol'],
+                            label: `${tickerSymbol['2. name']}(${tickerSymbol['1. symbol']})`
+                        })))
+                    }
+                }
             ).catch(
-                (error: any) => console.log(error)
+                (error: any) => {
+                    console.log(error);
+                    openNotificationWithIcon('error', 'Operation Failed', error.message);
+                }
             );
         }
     };
 
     const onSelect = (value: string) => {
         searchTickerSymbol(value).then(
-            (result: SearchTickerSymbolResponse) =>
-                setSymbolData(result.bestMatches[0])
+            (result: any) => {
+                if (!result.bestMatches) {
+                    openNotificationWithIcon('warning', 'Too Many Requests', result.message);
+                } else {
+                    setSymbolData(result?.bestMatches[0]);
+                }
+            }
         ).catch(
-            (error: any) => console.log(error)
+            (error: any) => {
+                console.log(error);
+                openNotificationWithIcon('error', 'Operation Failed', error.message);
+            }
         );
     };
 
     const addToFavorite = (value) => {
-        setSymbolList([...symbolList, value]);
+        setSymbolList([...symbolList.filter(item => item['1. symbol'] !== value['1. symbol']), value]);
     }
 
     const removeFromFavorite = (value) => {
-        setSymbolList([...symbolList.filter(item => item !== value)]);
+        setSymbolList([...symbolList.filter(item => item['1. symbol'] !== value['1. symbol'])]);
+    }
+
+    const isFavorite = (value) => {
+        return !(symbolList.filter(item => item['1. symbol'] === value['1. symbol'])).length;
     }
 
     return <>
-        <Row>
-            <Col span={4}>
+        {contextHolder}
+        {symbolData && <Row>
+            <Col span={6}>
                 <Row>
+                    <Divider orientation="left">Search Stock</Divider>
                     <AutoComplete
                         dropdownMatchSelectWidth={252}
                         style={{width: 300}}
@@ -67,7 +99,8 @@ export default function LandingPage() {
                         dataSource={symbolList}
                         renderItem={(item) =>
                             <List.Item>
-                                <Button type="link" onClick={() => onSelect(item['1. symbol'])}>{item['2. name']}({item['1. symbol']})</Button>
+                                <Button type="link"
+                                        onClick={() => onSelect(item['1. symbol'])}>{item['2. name']}({item['1. symbol']})</Button>
                                 <Tooltip title="Remove Favorite" style={{float: 'right'}}>
                                     <Button type="text"
                                             onClick={() => removeFromFavorite(item)}><DeleteOutlined/></Button>
@@ -78,14 +111,18 @@ export default function LandingPage() {
                 </Row>
             </Col>
             <Divider type="vertical" style={{height: "inherit"}}/>
-            {symbolData && <Col span={8} style={{padding: '50px'}}>
+            <Col span={17} style={{padding: '50px'}}>
 
                 <div style={{float: "right"}}>
-                    <Button icon={<StarOutlined/>}
-                            onClick={() => addToFavorite(symbolData)}> Favorite </Button>
+                    {isFavorite(symbolData) ? <Button icon={<StarOutlined/>} type="primary" size="small"
+                                                      onClick={() => addToFavorite(symbolData)}> Favorite </Button>
+                        :
+                        <Button icon={<StarFilled/>} size="small"
+                                onClick={() => removeFromFavorite(symbolData)}> Remove Favorite </Button>
+                    }
                 </div>
                 <div>
-                    <Title>{symbolData?.['2. name']}</Title>
+                    <Title level={3}>{symbolData?.['2. name']}</Title>
                     <Text>Ticker Symbol : {symbolData?.['1. symbol']}<Divider type="vertical"/>Currency
                         : {symbolData?.['8. currency']} <Divider type="vertical"/>Region : {symbolData?.['4. region']}
                     </Text>
@@ -95,7 +132,24 @@ export default function LandingPage() {
                         symbol={symbolData?.['1. symbol']}
                     />
                 </div>
-            </Col>}
-        </Row>
+            </Col>
+        </Row>}
+
+        {!symbolData && <Row style={{textAlign: "center"}}>
+            <Col span={24}>
+                <Title style={{fontSize: "xxx-large"}}>Welcome!</Title>
+                <Title style={{fontSize: "large", fontWeight: "normal"}}>Start searching for a stock or a ticker symbol
+                    to begin your journey</Title>
+                <AutoComplete
+                    dropdownMatchSelectWidth={252}
+                    style={{width: 1000}}
+                    options={options}
+                    onSelect={onSelect}
+                    onSearch={handleSearch}
+                >
+                    <Input.Search size="large" placeholder="Search Ticker" enterButton/>
+                </AutoComplete>
+            </Col>
+        </Row>}
     </>;
 }

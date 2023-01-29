@@ -1,19 +1,23 @@
 import React, {useEffect} from 'react';
-import {Col, Divider, Row} from 'antd';
+import {Col, Divider, Row, Typography} from 'antd';
 import {GOOGLE_APP_CLIENT_ID} from "../constants";
 import jwt_decode from "jwt-decode";
+import {StockOutlined} from "@ant-design/icons";
+
+const {Title} = Typography;
 
 export default function LoginPage({onLogin}) {
-    const onSuccess = (res) => {
-        let userInfo = jwt_decode(res.credential);
-        console.log('Login Success: currentUser:', userInfo);
-        localStorage.setItem("user", JSON.stringify(userInfo));
-        onLogin(userInfo);
-    };
+
 
     // https://developers.google.com/identity/gsi/web/reference/js-reference
 
     useEffect(() => {
+        const onSuccess = (res) => {
+            let userInfo = jwt_decode(res.credential);
+            localStorage.setItem("user", JSON.stringify(userInfo));
+            onLogin(userInfo);
+        };
+
         /* global google */
         if (window["google"]) {
             // @ts-ignore
@@ -33,61 +37,31 @@ export default function LoginPage({onLogin}) {
                 width: "500"
             });
         }
-    }, [onSuccess]);
+    }, []);
 
 
     // @ts-ignore
     return <>
         <Row>
-            <Col span={8}></Col>
-            <Col span={4}>
-                <div>
-                    <Divider orientation="right">Welcome</Divider>
-                    {/*<GoogleLogin
-                        clientId={GOOGLE_APP_CLIENT_ID}
-                        buttonText="Login with Google"
-                        onSuccess={onSuccess}
-                        onFailure={onFailure}
-                        cookiePolicy={'single_host_origin'}
-                    />*/}
+            <Col span={18} style={{padding: "40px"}}>
+                <Title style={{textAlign: "justify"}}>
+                    <StockOutlined className="icon" style={{fontSize: "xxx-large", color: "darkgreen"}}/> Stock Info
+                </Title>
+                    <Title level={4} style={{textAlign: "justify"}}>
+                        Welcome to StockInfo, your one-stop destination for all things stocks. Whether you're a seasoned investor or just starting out, we have the tools and resources you need to stay informed and make smart investment decisions.
 
-                    {/*<div id="g_id_onload"
-                         data-client_id={GOOGLE_APP_CLIENT_ID}
-                         data-context="signin"
-                         data-ux_mode="popup"
-                         data-callback={(res)=>onSuccess(res)}
-                         data-auto_prompt="false">
-                    </div>
+                    Our website offers a wide range of information on various stocks and markets, including real-time stock quotes, historical data, financial news, and market analysis. We also provide interactive charts and tools to help you understand and track the performance of your portfolio.
 
-                    <div className="g_id_signin"
-                         data-type="standard"
-                         data-shape="pill"
-                         data-theme="filled_blue"
-                         data-text="signin_with"
-                         data-size="large"
-                         data-logo_alignment="left"
-                         data-width="500">
-                    </div>*/}
-                    {/*<Helmet>
-                        <script>
-                            function handleCredentialResponse(response) {
-                            console.log("Encoded JWT ID token: " + response.credential);
-                        }
-                            window.onload = function () {
-                            google.accounts.id.initialize({
-                                client_id: {GOOGLE_APP_CLIENT_ID},
-                                callback: onSuccess
-                            });
-                            google.accounts.id.renderButton(
-                            document.getElementById("buttonDiv"),
-                        {theme: "outline", size: "large"}  // customization attributes
-                            );
-                            google.accounts.id.prompt(); // also display the One Tap dialog
-                        }
-                        </script>
-                    </Helmet>*/}
-                    <div id="buttonDiv"></div>
-                </div>
+                    In addition to stock information, we also offer educational resources to help you learn more about investing and the stock market. From beginner guides to advanced strategies, our goal is to empower you with the knowledge you need to succeed.
+
+                    Thank you for visiting StockInfo. We hope you find our website useful and informative, and we look forward to helping you navigate the markets with confidence.
+                    </Title>
+
+            </Col>
+            <Divider type="vertical" style={{height: "inherit"}}/>
+            <Col span={5} style={{padding: "20px"}}>
+                <Divider orientation="left">Sign In</Divider>
+                <div id="buttonDiv"></div>
             </Col>
         </Row>
     </>;

@@ -1,5 +1,5 @@
 export type TickerSymbol = {
-    "1. symbol" : string;
+    "1. symbol": string;
     "2. name": string;
     "3. type": string;
     "4. region": string;
@@ -11,15 +11,15 @@ export type TickerSymbol = {
 };
 
 export type MetaData = {
-    "1. Information" :string;
-    "2. Symbol" : string;
-    "3. Last Refreshed" : string;
-    "4. Output Size"? : string;
-    "5. Time Zone" : string;
+    "1. Information": string;
+    "2. Symbol": string;
+    "3. Last Refreshed": string;
+    "4. Output Size"?: string;
+    "5. Time Zone": string;
 };
 
 export type TimeSeriesEntry = {
-    [key:string] : {
+    [key: string]: {
         "1. open": string;
         "2. high": string;
         "3. low": string;
@@ -29,22 +29,22 @@ export type TimeSeriesEntry = {
 };
 
 export type SearchTickerSymbolResponse = {
-    bestMatches : TickerSymbol[]
+    bestMatches: TickerSymbol[]
 }
 
 export type DailyTimeSeriesResponse = {
-    'Meta Data' : MetaData;
-    'Time Series (Daily)' : {TimeSeriesEntry}
+    'Meta Data': MetaData;
+    'Time Series (Daily)': { TimeSeriesEntry }
 }
 
 export type WeeklyTimeSeriesResponse = {
-    'Meta Data' : MetaData;
-    'Weekly Time Series' : {TimeSeriesEntry}
+    'Meta Data': MetaData;
+    'Weekly Time Series': { TimeSeriesEntry }
 }
 
 export type MonthlyTimeSeriesResponse = {
-    'Meta Data' : MetaData;
-    'Monthly Time Series' : {TimeSeriesEntry}
+    'Meta Data': MetaData;
+    'Monthly Time Series': { TimeSeriesEntry }
 }
 
 export type TimeSeriesData = DailyTimeSeriesResponse | WeeklyTimeSeriesResponse | MonthlyTimeSeriesResponse;
@@ -59,3 +59,5 @@ export type StockItem = {
     Volume?: number;
     Date?: Date;
 }
+
+export type NotificationType = 'success' | 'info' | 'warning' | 'error';

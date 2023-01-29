@@ -1,38 +1,40 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat');
+
 body {
-  margin: 0;
-  font-family: Montserrat, serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: Montserrat, serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
 .site-layout-content {
-  height: 40dvmax;
-  padding: 25px;
+    height: 35dvmax;
+    padding: 25px;
 }
+
 .logo {
-  float: left;
-  color: white;
-  font-size: x-large;
+    float: left;
+    color: white;
+    font-size: x-large;
 }
 
 .logo .icon {
-  font-size: xx-large;
-  color: darkgreen;
+    font-size: xx-large;
+    color: darkgreen;
 }
 
 .user {
-  float: right;
-  color: white;
-  font-size: large;
+    float: right;
+    color: white;
+    font-size: large;
 }
 
-.logoutBtn, .logoutBtn:hover{
-  color: white;
-  font-size: large;
+.logoutBtn, .logoutBtn:hover {
+    color: white;
+    font-size: large;
 }

@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {IgrFinancialChart, IgrFinancialChartModule} from 'igniteui-react-charts';
-import {TimeSeriesData} from "../types";
+import {NotificationType, TimeSeriesData} from "../types";
 import {DAILY_TIME_SERIES, MONTHLY_TIME_SERIES, WEEKLY_TIME_SERIES} from "../constants";
 import {getTimeSeriesDaily, getTimeSeriesMonthly, getTimeSeriesWeekly} from "../services";
 import {convertData} from "../dataTransformer";
-import {Radio, RadioChangeEvent} from 'antd';
+import {notification, Radio, RadioChangeEvent} from 'antd';
 
 IgrFinancialChartModule.register();
 
@@ -17,6 +17,15 @@ export default function StockChart({symbol}: { symbol?: string }) {
         {label: 'Monthly', value: MONTHLY_TIME_SERIES},
     ];
 
+    const [api, contextHolder] = notification.useNotification();
+
+    const openNotificationWithIcon = (type: NotificationType, message: string, description: string) => {
+        api[type]({
+            message,
+            description,
+        });
+    };
+
     const onTimeSeriesTypeChange = ({target: {value}}: RadioChangeEvent) => {
         setSelectedTimeSeries(value);
     };
@@ -25,21 +34,44 @@ export default function StockChart({symbol}: { symbol?: string }) {
 
             switch (selectedTimeSeries) {
                 case DAILY_TIME_SERIES : {
-                    getTimeSeriesDaily(symbol).then((result: TimeSeriesData) => {
-                        setStockData(result);
-                    }).catch((error: any) => console.log(error));
+                    getTimeSeriesDaily(symbol).then((result: any) => {
+                        if (!result['Meta Data']) {
+                            openNotificationWithIcon('warning', 'Too Many Requests', result.message);
+                        } else {
+                            setStockData(result);
+                        }
+
+                    }).catch((error: any) => {
+                        console.log(error);
+                        openNotificationWithIcon('error', 'Operation Failed', error.message);
+                    });
                     break;
                 }
                 case WEEKLY_TIME_SERIES : {
-                    getTimeSeriesWeekly(symbol).then((result: TimeSeriesData) => {
-                        setStockData(result);
-                    }).catch((error: any) => console.log(error));
+                    getTimeSeriesWeekly(symbol).then((result: any) => {
+                        if (!result['Meta Data']) {
+                            openNotificationWithIcon('warning', 'Too Many Requests', result.message);
+                        } else {
+                            setStockData(result);
+                        }
+
+                    }).catch((error: any) => {
+                        console.log(error);
+                        openNotificationWithIcon('error', 'Operation Failed', error.message);
+                    });
                     break;
                 }
                 case MONTHLY_TIME_SERIES : {
-                    getTimeSeriesMonthly(symbol).then((result: TimeSeriesData) => {
-                        setStockData(result);
-                    }).catch((error: any) => console.log(error));
+                    getTimeSeriesMonthly(symbol).then((result: any) => {
+                        if (!result['Meta Data']) {
+                            openNotificationWithIcon('warning', 'Too Many Requests', result.message);
+                        } else {
+                            setStockData(result);
+                        }
+                    }).catch((error: any) => {
+                        console.log(error);
+                        openNotificationWithIcon('error', 'Operation Failed', error.message);
+                    });
                     break;
                 }
             }
@@ -48,6 +80,7 @@ export default function StockChart({symbol}: { symbol?: string }) {
 
     return (
         <div className="container sample">
+            {contextHolder}
             <div style={{padding: '10px'}}>
                 <Radio.Group options={timeSeriesOptions} onChange={onTimeSeriesTypeChange}
                              value={selectedTimeSeries} optionType="button"/>
