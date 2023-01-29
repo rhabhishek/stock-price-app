@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {IgrFinancialChart, IgrFinancialChartModule} from 'igniteui-react-charts';
 import {NotificationType, TimeSeriesData} from "../types";
-import {DAILY_TIME_SERIES, MONTHLY_TIME_SERIES, WEEKLY_TIME_SERIES} from "../constants";
-import {getTimeSeriesDaily, getTimeSeriesMonthly, getTimeSeriesWeekly} from "../services";
+import {DAILY_TIME_SERIES, INTRA_DAY_TIME_SERIES, MONTHLY_TIME_SERIES, WEEKLY_TIME_SERIES} from "../constants";
+import {getTimeSeriesDaily, getTimeSeriesIntraDay, getTimeSeriesMonthly, getTimeSeriesWeekly} from "../services";
 import {convertData} from "../dataTransformer";
 import {notification, Radio, RadioChangeEvent} from 'antd';
 
@@ -10,8 +10,9 @@ IgrFinancialChartModule.register();
 
 export default function StockChart({symbol}: { symbol?: string }) {
     const [stockData, setStockData] = useState<TimeSeriesData | {}>({});
-    const [selectedTimeSeries, setSelectedTimeSeries] = useState<string>(DAILY_TIME_SERIES);
+    const [selectedTimeSeries, setSelectedTimeSeries] = useState<string>(INTRA_DAY_TIME_SERIES);
     const timeSeriesOptions = [
+        {label: 'Intra Day', value: INTRA_DAY_TIME_SERIES},
         {label: 'Daily', value: DAILY_TIME_SERIES},
         {label: 'Weekly', value: WEEKLY_TIME_SERIES},
         {label: 'Monthly', value: MONTHLY_TIME_SERIES},
@@ -31,8 +32,21 @@ export default function StockChart({symbol}: { symbol?: string }) {
     };
     useEffect(() => {
         if (symbol?.length) {
-
             switch (selectedTimeSeries) {
+                case INTRA_DAY_TIME_SERIES : {
+                    getTimeSeriesIntraDay(symbol).then((result: any) => {
+                        if (!result['Meta Data']) {
+                            openNotificationWithIcon('warning', 'Too Many Requests', result.message);
+                        } else {
+                            setStockData(result);
+                        }
+
+                    }).catch((error: any) => {
+                        console.log(error);
+                        openNotificationWithIcon('error', 'Operation Failed', error.message);
+                    });
+                    break;
+                }
                 case DAILY_TIME_SERIES : {
                     getTimeSeriesDaily(symbol).then((result: any) => {
                         if (!result['Meta Data']) {

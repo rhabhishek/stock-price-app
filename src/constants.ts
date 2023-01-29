@@ -1,3 +1,4 @@
+export const INTRA_DAY_TIME_SERIES = 'Time Series (5min)';
 export const DAILY_TIME_SERIES = 'Time Series (Daily)';
 export const WEEKLY_TIME_SERIES = 'Weekly Time Series';
 export const MONTHLY_TIME_SERIES = 'Monthly Time Series';

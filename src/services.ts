@@ -1,5 +1,6 @@
 import {
     DailyTimeSeriesResponse,
+    IntraDayTimeSeriesResponse,
     MonthlyTimeSeriesResponse,
     SearchTickerSymbolResponse,
     WeeklyTimeSeriesResponse
@@ -19,6 +20,11 @@ const options = {
 
 export const searchTickerSymbol = (keyword: string): Promise<SearchTickerSymbolResponse> => {
     return fetch(`${baseURL}query?function=SYMBOL_SEARCH&keywords=${keyword}&datatype=json`, options)
+        .then(response => response.json());
+}
+
+export const getTimeSeriesIntraDay = (symbol: string): Promise<IntraDayTimeSeriesResponse> => {
+    return fetch(`${baseURL}query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&datatype=json&interval=5min`, options)
         .then(response => response.json());
 }
 

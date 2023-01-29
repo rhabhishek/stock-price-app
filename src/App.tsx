@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import type { FC } from 'react';
+import type {FC} from 'react';
+import React from 'react';
 import 'antd/dist/reset.css';
 import './App.css';
 import Index from "./components";

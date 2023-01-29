@@ -32,6 +32,11 @@ export type SearchTickerSymbolResponse = {
     bestMatches: TickerSymbol[]
 }
 
+export type IntraDayTimeSeriesResponse = {
+    'Meta Data': MetaData;
+    'Time Series (5min)': { TimeSeriesEntry }
+}
+
 export type DailyTimeSeriesResponse = {
     'Meta Data': MetaData;
     'Time Series (Daily)': { TimeSeriesEntry }
