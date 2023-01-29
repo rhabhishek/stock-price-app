@@ -48,7 +48,7 @@ export default function Index() {
                     {loggedInUser && <LandingPage/>}
                 </div>
             </Content>
-            <Footer style={{textAlign: 'center'}}>Created by Abhishek Rattihalli ©2023 <Divider type="vertical"/> <Button type="link" href="#"><GithubOutlined /> Github</Button></Footer>
+            <Footer style={{textAlign: 'center'}}>Created by Abhishek Rattihalli ©2023 <Divider type="vertical"/> <Button type="link" href="https://github.com/rhabhishek/stock-price-app"><GithubOutlined /> Github</Button></Footer>
         </Layout>
     </>;
 }
