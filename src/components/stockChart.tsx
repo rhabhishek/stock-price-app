@@ -9,6 +9,7 @@ import {notification, Radio, RadioChangeEvent} from 'antd';
 IgrFinancialChartModule.register();
 
 export default function StockChart({symbol}: { symbol?: string }) {
+
     const [stockData, setStockData] = useState<TimeSeriesData | {}>({});
     const [selectedTimeSeries, setSelectedTimeSeries] = useState<string>(INTRA_DAY_TIME_SERIES);
     const timeSeriesOptions = [
@@ -108,7 +109,7 @@ export default function StockChart({symbol}: { symbol?: string }) {
                 yAxisMode="Numeric"
                 yAxisTitle="Price"
                 zoomSliderType="Line"
-                dataSource={convertData(stockData[selectedTimeSeries])}/>
+                dataSource={[convertData(stockData[selectedTimeSeries])]}/>
         </div>
     );
 }

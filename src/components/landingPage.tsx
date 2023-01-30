@@ -1,19 +1,21 @@
 import React, {useState} from 'react';
 import {AutoComplete, Button, Col, Divider, Input, List, notification, Row, Tooltip, Typography} from 'antd';
 import StockChart from "./stockChart";
+import Dashboard from "./dashboard";
 import {NotificationType, PickListOption, TickerSymbol} from "../types";
 import {searchTickerSymbol} from "../services";
 import './LandingPage.css';
-import {DeleteOutlined, StarFilled, StarOutlined} from '@ant-design/icons';
+import {DashboardOutlined, DeleteOutlined, StarFilled, StarOutlined} from '@ant-design/icons';
+import {DEMO_FAVORITE_LIST} from "../constants";
 
 const {Title, Text} = Typography;
 
 
 export default function LandingPage() {
 
-    const [symbolList, setSymbolList] = useState<TickerSymbol[]>([]);
+    const [symbolList, setSymbolList] = useState<TickerSymbol[]>(DEMO_FAVORITE_LIST);
     const [options, setOptions] = useState<PickListOption[]>([]);
-    const [symbolData, setSymbolData] = useState<TickerSymbol>();
+    const [symbolData, setSymbolData] = useState<TickerSymbol | null>(null);
 
     const [api, contextHolder] = notification.useNotification();
 
@@ -73,12 +75,14 @@ export default function LandingPage() {
     }
 
     const isFavorite = (value) => {
-        return !(symbolList.filter(item => item['1. symbol'] === value['1. symbol'])).length;
+        return value && !(symbolList.filter(item => item['1. symbol'] === value?.['1. symbol'])).length;
     }
+
+    const goToDashboard = () => setSymbolData(null);
 
     return <>
         {contextHolder}
-        {symbolData && <Row>
+        {(symbolData || symbolList.length) && <Row>
             <Col span={6}>
                 <Row>
                     <Divider orientation="left">Search Stock</Divider>
@@ -112,30 +116,42 @@ export default function LandingPage() {
             </Col>
             <Divider type="vertical" style={{height: "inherit"}}/>
             <Col span={17} style={{padding: '50px'}}>
-
-                <div style={{float: "right"}}>
-                    {isFavorite(symbolData) ? <Button icon={<StarOutlined/>} type="primary" size="small"
-                                                      onClick={() => addToFavorite(symbolData)}> Favorite </Button>
-                        :
-                        <Button icon={<StarFilled/>} size="small"
-                                onClick={() => removeFromFavorite(symbolData)}> Remove Favorite </Button>
-                    }
-                </div>
-                <div>
-                    <Title level={3}>{symbolData?.['2. name']}</Title>
-                    <Text>Ticker Symbol : {symbolData?.['1. symbol']}<Divider type="vertical"/>Currency
-                        : {symbolData?.['8. currency']} <Divider type="vertical"/>Region : {symbolData?.['4. region']}
-                    </Text>
-                </div>
-                <div style={{paddingTop: '20px'}}>
-                    <StockChart
-                        symbol={symbolData?.['1. symbol']}
-                    />
-                </div>
+                {symbolData ?
+                    <>
+                        <div style={{float: "left"}}>
+                            <Button icon={<DashboardOutlined/>} size="small"
+                                    onClick={() => goToDashboard()}> Go to Dashboard </Button>
+                        </div>
+                        <div style={{float: "right"}}>
+                            {isFavorite(symbolData) ? <Button icon={<StarOutlined/>} type="primary" size="small"
+                                                              onClick={() => addToFavorite(symbolData)}> Favorite </Button>
+                                :
+                                <Button icon={<StarFilled/>} size="small"
+                                        onClick={() => removeFromFavorite(symbolData)}> Remove Favorite </Button>
+                            }
+                        </div>
+                        <div>
+                            <Title level={3}>{symbolData?.['2. name']}</Title>
+                            <Text>Ticker Symbol : {symbolData?.['1. symbol']}<Divider type="vertical"/>Currency
+                                : {symbolData?.['8. currency']} <Divider type="vertical"/>Region
+                                : {symbolData?.['4. region']}
+                            </Text>
+                        </div>
+                        <div style={{paddingTop: '20px'}}>
+                            <StockChart
+                                symbol={symbolData?.['1. symbol']}
+                            />
+                        </div>
+                    </>
+                    :
+                    <div style={{paddingTop: '20px'}}>
+                        <Dashboard
+                            symbolList={symbolList.map(symbol => symbol['1. symbol'])}/>
+                    </div>}
             </Col>
         </Row>}
 
-        {!symbolData && <Row style={{textAlign: "center"}}>
+        {!(symbolData || symbolList.length) && <Row style={{textAlign: "center"}}>
             <Col span={24}>
                 <Title style={{fontSize: "xxx-large"}}>Welcome!</Title>
                 <Title style={{fontSize: "large", fontWeight: "normal"}}>Start searching for a stock or a ticker symbol
